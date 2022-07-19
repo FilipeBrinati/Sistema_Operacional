@@ -17,8 +17,8 @@
 
 typedef struct lottery_params {
         int num_tickets;
-        //...
-        //...
+        int begin_interval;
+        int end_interval;
 } LotterySchedParams;
 
 //Funcao chamada pela inicializacao do S.O. para a incializacao do escalonador
