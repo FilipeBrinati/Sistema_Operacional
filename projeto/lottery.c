@@ -129,8 +129,11 @@ Process *lottSchedule(Process *plist)
 // Retorna o numero do slot ao qual o processo estava associado
 int lottReleaseParams(Process *p)
 {
-	//...
-	return 0;
+	int slot = processGetSchedSlot(p);
+	LotterySchedParams* params = processGetSchedParams(p);
+	free(params);
+
+	return slot;
 }
 
 // Transfere certo numero de tickets do processo src para o processo dst.
