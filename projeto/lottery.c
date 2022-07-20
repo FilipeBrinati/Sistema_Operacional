@@ -14,7 +14,35 @@
 
 // Nome unico do algoritmo. Deve ter 4 caracteres.
 const char lottName[] = "LOTT";
+unsigned int tot_tickets = 0;
+unsigned char needs_distribute = 1;
+int slot = -1;
 //=====Funcoes Auxiliares=====
+
+void addProcessToLottery(Process *p)
+{
+	LotterySchedParams *params;
+
+	params = processGetSchedParams(p);
+	params->begin_interval = tot_tickets;
+	tot_tickets += params->num_tickets;
+	params->end_interval = tot_tickets;
+}
+
+void distributeTickets(Process *plist)
+{
+	Process *p;
+	LotterySchedParams *params;
+	tot_tickets = 0;
+
+	for (p = plist; p != NULL; p = processGetNext(p))
+	{
+		if (processGetStatus(p) == PROC_READY)
+			addProcessToLottery(p);
+	}
+
+	needs_distribute = 0;
+}
 
 //=====Funcoes da API=====
 
@@ -37,21 +65,34 @@ void lottInitSchedInfo()
 	si->scheduleFn = &lottSchedule;
 	si->releaseParamsFn = &lottReleaseParams;
 
-	schedRegisterScheduler(si);
+	slot = schedRegisterScheduler(si);
 }
 
 // Inicializa os parametros de escalonamento de um processo p, chamada
 // normalmente quando o processo e' associado ao slot de Lottery
 void lottInitSchedParams(Process *p, void *params)
 {
-	processSetSchedParams(p, params);
+	schedSetScheduler(p, params, slot);
+	addProcessToLottery(p);
 }
 
 // Recebe a notificação de que um processo sob gerência de Lottery mudou de estado
 // Deve realizar qualquer atualização de dados da Loteria necessária quando um processo muda de estado
 void lottNotifyProcStatusChange(Process *p)
 {
-	//...
+	LotterySchedParams *params;
+	int status = processGetStatus(p);
+
+	switch (status)
+	{
+	case PROC_READY:
+		addProcessToLottery(p);
+		break;
+
+	default:
+		needs_distribute = 1;
+		break;
+	}
 }
 
 // Retorna o proximo processo a obter a CPU, conforme o algortimo Lottery
@@ -59,18 +100,10 @@ Process *lottSchedule(Process *plist)
 {
 	Process *p = plist, *chosen = NULL;
 	LotterySchedParams *params;
-	int tot_tickets = 0, chosen_ticket;
+	int chosen_ticket;
 
-	for (p = plist; p != NULL; p = processGetNext(p))
-	{
-		if (processGetStatus(p) == PROC_READY)
-		{
-			params = processGetSchedParams(p);
-			params->begin_interval = tot_tickets;
-			tot_tickets += params->num_tickets;
-			params->end_interval = tot_tickets;
-		}
-	}
+	if (needs_distribute)
+		distributeTickets(plist);
 
 	chosen_ticket = rand() % tot_tickets;
 
