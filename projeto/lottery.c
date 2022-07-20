@@ -44,7 +44,7 @@ void lottInitSchedInfo()
 // normalmente quando o processo e' associado ao slot de Lottery
 void lottInitSchedParams(Process *p, void *params)
 {
-	p->sched_params = params;
+	processSetSchedParams(p, params);
 }
 
 // Recebe a notificação de que um processo sob gerência de Lottery mudou de estado
@@ -61,11 +61,11 @@ Process *lottSchedule(Process *plist)
 	LotterySchedParams *params;
 	int tot_tickets = 0, chosen_ticket;
 
-	for (p = plist; p != NULL; p = p->next)
+	for (p = plist; p != NULL; p = processGetNext(p))
 	{
-		if (p->status == PROC_READY)
+		if (processGetStatus(p) == PROC_READY)
 		{
-			params = p->sched_params;
+			params = processGetSchedParams(p);
 			params->begin_interval = tot_tickets;
 			tot_tickets += params->num_tickets;
 			params->end_interval = tot_tickets;
@@ -74,11 +74,11 @@ Process *lottSchedule(Process *plist)
 
 	chosen_ticket = rand() % tot_tickets;
 
-	for (p = plist; p != NULL; p = p->next)
+	for (p = plist; p != NULL; p = processGetNext(p))
 	{
-		if (p->status == PROC_READY)
+		if (processGetStatus(p) == PROC_READY)
 		{
-			params = p->sched_params;
+			params = processGetSchedParams(p);
 
 			if (chosen_ticket >= params->begin_interval && chosen_ticket < params->end_interval)
 			{
