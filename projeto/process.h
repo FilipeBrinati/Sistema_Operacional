@@ -21,17 +21,7 @@
 #define PROC_RUNNING 8
 #define PROC_TERMINATING 16
 
-typedef struct proc
-{
-    int pid;            // Identificador do Processo
-    int ppid;           // Identificador do Processo Pai
-    int status;         // Status do Processo
-    int cpu_usage;      // Tempo total de uso da CPU
-    int sched_slot;     // Slot do algoritmo de escalonamento associado
-    void *sched_params; // Pont generico para parametros de escalonamento
-    struct proc *prev;  // Encadeamento processo anterior
-    struct proc *next;  // Encadeamento processo posterior
-} Process;
+typedef struct proc Process;
 
 // Retorna o pid de um processo
 int processGetPid(Process *p);

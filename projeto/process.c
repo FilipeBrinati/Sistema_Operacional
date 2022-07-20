@@ -15,16 +15,16 @@
 #include "process.h"
 #include "sched.h"
 
-// struct proc {
-// 	int pid;		//Identificador do Processo
-// 	int ppid;		//Identificador do Processo Pai
-// 	int status;		//Status do Processo
-// 	int cpu_usage;		//Tempo total de uso da CPU
-// 	int sched_slot;		//Slot do algoritmo de escalonamento associado
-// 	void* sched_params;	//Pont generico para parametros de escalonamento
-// 	struct proc *prev;	//Encadeamento processo anterior
-// 	struct proc *next;	//Encadeamento processo posterior
-// };
+struct proc {
+	int pid;		//Identificador do Processo
+	int ppid;		//Identificador do Processo Pai
+	int status;		//Status do Processo
+	int cpu_usage;		//Tempo total de uso da CPU
+	int sched_slot;		//Slot do algoritmo de escalonamento associado
+	void* sched_params;	//Pont generico para parametros de escalonamento
+	struct proc *prev;	//Encadeamento processo anterior
+	struct proc *next;	//Encadeamento processo posterior
+};
 
 //Retorna o pid de um processo
 int processGetPid(Process *p) {
