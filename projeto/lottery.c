@@ -130,7 +130,7 @@ Process *lottSchedule(Process *plist)
 int lottReleaseParams(Process *p)
 {
 	int slot = processGetSchedSlot(p);
-	LotterySchedParams* params = processGetSchedParams(p);
+	LotterySchedParams *params = processGetSchedParams(p);
 	free(params);
 
 	return slot;
@@ -140,6 +140,18 @@ int lottReleaseParams(Process *p)
 // Retorna o numero de tickets efetivamente transfeirdos (pode ser menos)
 int lottTransferTickets(Process *src, Process *dst, int tickets)
 {
-	//...
-	return 0;
+	LotterySchedParams *p1 = processGetSchedParams(src),
+					   *p2 = processGetSchedParams(dst);
+
+	int actual;
+	if (p1->num_tickets < tickets)
+		actual = p1->num_tickets;
+	else
+		actual = tickets;
+
+	p1->num_tickets -= actual;
+	p2->num_tickets += actual;
+
+	needs_distribute = 1;
+	return actual;
 }
