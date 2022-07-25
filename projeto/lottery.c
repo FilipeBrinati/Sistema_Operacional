@@ -1,7 +1,7 @@
 /*
  *  lottery.c - Implementacao do algoritmo Lottery Scheduling e sua API
  *
- *  Autores: SUPER_PROGRAMADORES_C
+ *  Autores: Filipe Brinati, Paulo Rozatto, Pedro Henrique Oliveira
  *  Projeto: Trabalho Pratico I - Sistemas Operacionais
  *  Organizacao: Universidade Federal de Juiz de Fora
  *  Departamento: Dep. Ciencia da Computacao
@@ -12,13 +12,14 @@
 #include <stdio.h>
 #include <string.h>
 
-// Nome unico do algoritmo. Deve ter 4 caracteres.
-const char lottName[] = "LOTT";
-unsigned int tot_tickets = 0;
-unsigned char needs_distribute = 1;
-int slot = -1;
+const char lottName[] = "LOTT";		// Nome unico do algoritmo. Deve ter 4 caracteres.
+unsigned int tot_tickets = 0;		// Guarda o total de tickets ativos
+unsigned char needs_distribute = 1; // Flag que indica se precisa recalcular os intervalos de sorteio de cada ticket
+int slot = -1;						// Guarda o slot retornado pelo schedRegisterScheduler
 //=====Funcoes Auxiliares=====
 
+// Adciona um processo para sorteio atribuindo para ele um intervalo
+// Nao precisa redistribuir os intervalos dos outros ticktets, pois ele e adcionado no final
 void addProcessToLottery(Process *p)
 {
 	LotterySchedParams *params;
@@ -29,6 +30,8 @@ void addProcessToLottery(Process *p)
 	params->end_interval = tot_tickets;
 }
 
+// Distribui intervalo para sorteio para cada processo pronto
+// baseado na quantidade de tickets que o processo tem
 void distributeTickets(Process *plist)
 {
 	Process *p;
@@ -83,6 +86,9 @@ void lottNotifyProcStatusChange(Process *p)
 	LotterySchedParams *params;
 	int status = processGetStatus(p);
 
+	// Se um processo ficou pronto, adicione ele a loteria
+	// Do contrario, o processo nao esta mais pronto e deixou a loteria
+	// logo se precisa recalcular os intervalos
 	switch (status)
 	{
 	case PROC_READY:
